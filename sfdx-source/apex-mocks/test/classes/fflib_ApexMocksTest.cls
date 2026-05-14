@@ -751,6 +751,25 @@ private class fflib_ApexMocksTest
 	}
 
 	@isTest
+	static void whenMockVoidMethodRecordsCallCanVerify()
+	{
+		// Given
+		fflib_ApexMocks mocks = new fflib_ApexMocks();
+		fflib_MyList mockList = (fflib_MyList)mocks.mock(fflib_MyList.class);
+
+		// When
+		mocks.mockVoidMethod(
+			mockList,
+			'clear',
+			new List<Type>(),
+			new List<Object>()
+		);
+
+		// Then
+		((fflib_MyList.IList) mocks.verify(mockList, 1)).clear();
+	}
+
+	@isTest
 	static void thatMultipleInstancesCanBeMockedIndependently()
 	{
 		fflib_ApexMocksConfig.HasIndependentMocks = true;
