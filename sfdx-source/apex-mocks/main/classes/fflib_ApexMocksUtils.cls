@@ -199,11 +199,17 @@ public class fflib_ApexMocksUtils
 		}
 
 		public void nextToken(JSONParser fromStream, Integer depth, JSONGenerator toStream) {
-			// Inject children?
+			// Inject the additional fields when the current SObject closes
 			JSONToken currentToken = fromStream.getCurrentToken();
 			if(depth == 1 && currentToken == JSONToken.END_OBJECT ) {
 				for(String field : properties.keySet()) {
-					toStream.writeObjectField(field, properties.get(field));
+					Object value = properties.get(field);
+					// writeObjectField throws on null, so write an explicit null field instead
+					if(value == null) {
+						toStream.writeNullField(field);
+					} else {
+						toStream.writeObjectField(field, value);
+					}
 				}
 			}
 		}
