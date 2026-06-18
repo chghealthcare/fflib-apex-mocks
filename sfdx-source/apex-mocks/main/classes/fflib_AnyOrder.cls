@@ -29,7 +29,7 @@ public class fflib_AnyOrder extends fflib_MethodVerifier
 		fflib_VerificationMode verificationMode)
 	{
 		List<fflib_IMatcher> expectedMatchers = fflib_Match.Matching ? fflib_Match.getAndClearMatchers(expectedArguments.argValues.size()) : null;
-		List<fflib_MethodArgValues> actualArguments = methodCountRecorder.getMethodArgumentsByTypeName().get(qm);
+		List<fflib_MethodArgValues> actualArguments = methodCountRecorder.getInstanceMethodArgumentsByTypeName().get(qm);
 
 		Integer methodCount = getMethodCount(expectedArguments, expectedMatchers, actualArguments);
 

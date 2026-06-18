@@ -186,7 +186,7 @@ public with sharing class fflib_ApexMocks implements System.StubProvider
 	 * @return The list of methods called in order.
 	 */
 	public List<fflib_InvocationOnMock> getOrderedMethodCalls() {
-		return methodCountRecorder.getOrderedMethodCalls();
+		return methodCountRecorder.getInstanceOrderedMethodCalls();
 	}
 
 	/**

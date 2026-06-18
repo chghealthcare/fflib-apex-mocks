@@ -16,17 +16,19 @@ public with sharing class fflib_MethodCountRecorder
 	 *
 	 * Object: map of count by method call argument.
 	 */
-	private Map<fflib_QualifiedMethod, List<fflib_MethodArgValues>> methodArgumentsByTypeName =
+	private final Map<fflib_QualifiedMethod, List<fflib_MethodArgValues>> methodArgumentsByTypeName =
 		new Map<fflib_QualifiedMethod, List<fflib_MethodArgValues>>();
 
-	private List<fflib_InvocationOnMock> orderedMethodCalls =
+	private final List<fflib_InvocationOnMock> orderedMethodCalls =
 		new List<fflib_InvocationOnMock>();
+
+	private static final fflib_MethodCountRecorder STATIC_RECORDER = new fflib_MethodCountRecorder();
 
 	/**
 	 * Getter for the list of the methods ordered calls.
 	 * @return The list of methods called in order.
 	 */
-	public List<fflib_InvocationOnMock> getOrderedMethodCalls()
+	public List<fflib_InvocationOnMock> getInstanceOrderedMethodCalls()
 	{
 		return orderedMethodCalls;
 	}
@@ -35,9 +37,29 @@ public with sharing class fflib_MethodCountRecorder
 	 * Getter for the map of the method's calls with the related arguments.
 	 * @return The map of methods called with the arguments.
 	 */
-	public Map<fflib_QualifiedMethod, List<fflib_MethodArgValues>> getMethodArgumentsByTypeName()
+	public Map<fflib_QualifiedMethod, List<fflib_MethodArgValues>> getInstanceMethodArgumentsByTypeName()
 	{
 		return methodArgumentsByTypeName;
+	}
+
+	/**
+	 * Getter for the list of the methods ordered calls.
+	 * @return The list of methods called in order.
+	 * @deprecated Use {@link #getInstanceOrderedMethodCalls()} instead.
+	 */
+	public static List<fflib_InvocationOnMock> getOrderedMethodCalls()
+	{
+		return STATIC_RECORDER.getInstanceOrderedMethodCalls();
+	}
+
+	/**
+	 * Getter for the map of the method's calls with the related arguments.
+	 * @return The map of methods called with the arguments.
+	 * @deprecated Use {@link #getInstanceMethodArgumentsByTypeName()} instead.
+	 */
+	public static Map<fflib_QualifiedMethod, List<fflib_MethodArgValues>> getMethodArgumentsByTypeName()
+	{
+		return STATIC_RECORDER.getInstanceMethodArgumentsByTypeName();
 	}
 
 	/**
