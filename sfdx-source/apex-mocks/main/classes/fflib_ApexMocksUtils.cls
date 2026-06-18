@@ -192,10 +192,12 @@ public class fflib_ApexMocksUtils
 	 */
 	private class InjectFieldsEventHandler implements JSONParserEvents
 	{
-		Map<String, Object> properties;
+		Map<String, Object> properties = new Map<String, Object>();
 
 		public InjectFieldsEventHandler(Map<String, Object> properties) {
-			this.properties = properties;
+			if (properties != null && !properties.isEmpty()) {
+				this.properties.putAll(properties);
+			}
 		}
 
 		public void nextToken(JSONParser fromStream, Integer depth, JSONGenerator toStream) {
