@@ -114,13 +114,12 @@ public class fflib_ApexMocksUtils
 	 */
 	@NamespaceAccessible
 	public static Object setReadOnlyFields(SObject objInstance, Type deserializeType, Map<String, Object> properties) {
+		JSONParser parser = JSON.createParser((JSON.serialize(objInstance)));
+		JSONGenerator combinedOutput = JSON.createGenerator(false);
 
-		Map<String, Object> mergedMap = new Map<String, Object>(objInstance.getPopulatedFieldsAsMap());
-		// Merge the values from the properties map into the fields already set on the object
-		mergedMap.putAll(properties);
-		// Serialize the merged map, and then deserialize it as the desired object type.
-		String jsonString = JSON.serializePretty(mergedMap);
-		return (SObject) JSON.deserialize(jsonString, deserializeType);
+		// parse the source object and inject new fields into the resulting JSON
+		streamTokens(parser, combinedOutput, new InjectFieldsEventHandler(properties) );
+		return JSON.deserialize(combinedOutput.getAsString(), deserializeType);
 	}
 
 	/**
@@ -183,6 +182,37 @@ public class fflib_ApexMocksUtils
 				streamTokens(childrenParser, toStream, null);
 				toStream.writeEndObject();
 				childListIdx++;
+			}
+		}
+	}
+
+	/**
+	 * Monitors stream events for end of object for the current SObject
+	 *   then injects new fields into the stream
+	 */
+	private class InjectFieldsEventHandler implements JSONParserEvents
+	{
+		Map<String, Object> properties = new Map<String, Object>();
+
+		public InjectFieldsEventHandler(Map<String, Object> properties) {
+			if (properties != null && !properties.isEmpty()) {
+				this.properties.putAll(properties);
+			}
+		}
+
+		public void nextToken(JSONParser fromStream, Integer depth, JSONGenerator toStream) {
+			// Inject the additional fields when the current SObject closes
+			JSONToken currentToken = fromStream.getCurrentToken();
+			if(depth == 1 && currentToken == JSONToken.END_OBJECT ) {
+				for(String field : properties.keySet()) {
+					Object value = properties.get(field);
+					// writeObjectField throws on null, so write an explicit null field instead
+					if(value == null) {
+						toStream.writeNullField(field);
+					} else {
+						toStream.writeObjectField(field, value);
+					}
+				}
 			}
 		}
 	}
