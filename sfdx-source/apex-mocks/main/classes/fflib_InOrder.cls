@@ -6,6 +6,7 @@
 /**
  * @group Core
  */
+@NamespaceAccessible
 public with sharing class fflib_InOrder extends fflib_MethodVerifier
 {
 	private final List<Object> unorderedMockInstances;
@@ -24,7 +25,9 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 	 * Construct the InOrder instance.
 	 * @param mocks The apex mock object instance.
 	 * @param unorderedMockInstances One or more mock implementation classes (listed in any order), whose ordered method calls require verification.
+	 * @deprecated Obtain an instance by calling {@link fflib_ApexMocks#inOrder(List&lt;Object&gt;)}
 	 */
+	@NamespaceAccessible
 	public fflib_InOrder(fflib_ApexMocks mocks, List<Object> unorderedMockInstances)
 	{
 		this.unorderedMockInstances = unorderedMockInstances;
@@ -40,6 +43,7 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 	 * @param verificationMode Defines the constraints for performing the verification (e.g. the minimum and maximum expected invocation counts).
 	 * @return The mock object instance.
 	 */
+	@NamespaceAccessible
 	public Object verify(Object mockInstance, fflib_VerificationMode verificationMode)
 	{
 		mocks.setOrderedVerifier(this);
@@ -52,6 +56,7 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 	 * @param mockInstance The mock object instance.
 	 * @return The mock object instance.
 	 */
+	@NamespaceAccessible
 	public Object verify(Object mockInstance)
 	{
 		mocks.setOrderedVerifier(this);
@@ -66,6 +71,7 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 	 * @param times The number of times you expect the method to have been called.
 	 * @return The mock object instance.
 	 */
+	@NamespaceAccessible
 	public Object verify(Object mockInstance, Integer times)
 	{
 		mocks.setOrderedVerifier(this);
@@ -76,6 +82,7 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 	 * Verify that after the last successful verified method no more interactions happened on the inOrderMock instance.
 	 * @throws Exception with message to help to identify the last method called.
 	 */
+	@NamespaceAccessible
 	public void verifyNoMoreInteractions()
 	{
 		if(idxMethodCall == 0)
@@ -86,7 +93,7 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 		if(hasNextInteraction(unorderedMockInstances, idxMethodCall))
 		{
 			fflib_InvocationOnMock invocation =
-				fflib_MethodCountRecorder.getOrderedMethodCalls().get(idxMethodCall -1);
+				mocks.getOrderedMethodCalls().get(idxMethodCall -1);
 
 			throw new fflib_ApexMocks.ApexMocksException(
 				'No more Interactions were expected after the ' + invocation.getMethod() +' method.');
@@ -97,6 +104,7 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 	 * Verify that no interactions at all happened on the inOrderMock instance.
 	 * @throws Exception with message.
 	 */
+	@NamespaceAccessible
 	public void verifyNoInteractions()
 	{
 		if(hasNextInteraction(unorderedMockInstances, 0))
@@ -121,7 +129,7 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 	{
 		String inOrder = ' in order';
 		List<fflib_IMatcher> matchers = fflib_Match.Matching ? fflib_Match.getAndClearMatchers(expectedArguments.argValues.size()) : null;
-		List<fflib_InvocationOnMock> actualInvocations = fflib_MethodCountRecorder.getOrderedMethodCalls();
+		List<fflib_InvocationOnMock> actualInvocations = mocks.getOrderedMethodCalls();
 		List<fflib_MethodArgValues> actualArguments = new List<fflib_MethodArgValues>();
 		for (fflib_InvocationOnMock invocation : actualInvocations)
 		{
@@ -201,9 +209,9 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 	{
 		Integer interactionsCouter = 0;
 
-		for (Integer i = idxMethodCall, len = fflib_MethodCountRecorder.getOrderedMethodCalls().size(); i<len; i++)
+		for (Integer i = idxMethodCall, len = mocks.getOrderedMethodCalls().size(); i<len; i++)
 		{
-			fflib_InvocationOnMock invocation = fflib_MethodCountRecorder.getOrderedMethodCalls().get(i);
+			fflib_InvocationOnMock invocation = mocks.getOrderedMethodCalls().get(i);
 			for (Object mockInstance : unorderedMockInstances)
 			{
 				if (invocation.getMock() === mockInstance
@@ -226,9 +234,9 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 		Integer lastInteracionIndex = 0;
 
 		//going all through the orderedMethodCalls to find all the interaction of the method
-		for (Integer i = idxMethodCall, len = fflib_MethodCountRecorder.getOrderedMethodCalls().size(); i<len; i++)
+		for (Integer i = idxMethodCall, len = mocks.getOrderedMethodCalls().size(); i<len; i++)
 		{
-			fflib_InvocationOnMock invocation = fflib_MethodCountRecorder.getOrderedMethodCalls().get(i);
+			fflib_InvocationOnMock invocation = mocks.getOrderedMethodCalls().get(i);
 			for (Object mockInstance : unorderedMockInstances)
 			{
 				if (invocation.getMock() === mockInstance
@@ -280,7 +288,7 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 	private fflib_InvocationOnMock getNextMethodCall(Boolean updateIdxMethodCall)
 	{
 		Integer idx = 0;
-		for (fflib_InvocationOnMock invocation : fflib_MethodCountRecorder.getOrderedMethodCalls())
+		for (fflib_InvocationOnMock invocation : mocks.getOrderedMethodCalls())
 		{
 			if (idx == idxMethodCall)
 			{
@@ -323,7 +331,7 @@ public with sharing class fflib_InOrder extends fflib_MethodVerifier
 	{
 		Integer idx = 0;
 
-		for (fflib_InvocationOnMock methodCall : fflib_MethodCountRecorder.getOrderedMethodCalls())
+		for (fflib_InvocationOnMock methodCall : mocks.getOrderedMethodCalls())
 		{
 			if (isForMockInstance(methodCall))
 			{
